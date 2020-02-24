@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from lxml import html
-from utils import parse_form
-from common import Banking, AuthenticationError
 import json
 import requests
+from banking import Banking
+from utils import parse_form
+from utils import loginrequired
 
 
 class TimPay(Banking):
 
     ENROLL_URL = "https://www.hype.it/api/rest/FREE/timenrollment"
+    PROFILE_URL = "https://api.platfr.io/api/hype/v1/user/financial-situation"
 
     def login(self, misdn, username, password):
         enroll = self._session.get(
@@ -32,7 +33,7 @@ class TimPay(Banking):
         try:
             auth_form = parse_form(auth.text)
         except IndexError:
-            raise AuthenticationError("Login failed")
+            raise self.AuthenticationError("Login failed")
         res = self._session.post(
             auth_form["url"],
             data=auth_form["post_data"],
@@ -42,15 +43,17 @@ class TimPay(Banking):
             self.token = res.json()["data"]["c_oauth_token"]
             self._session = requests.Session()
             self._session.headers.update({
-                "hype_token": self.token,
                 "Auth-Token": self.token,
                 "Auth-Schema": "OAUTH-TIM"
             })
         except json.decoder.JSONDecodeError:
-            raise AuthenticationError("Failed to parse response for OAuth token request")
+            raise self.AuthenticationError("Failed to parse response for OAuth token request")
         except KeyError:
-            raise AuthenticationError("Failed to retrieve OAuth token")
+            raise self.AuthenticationError("Failed to retrieve OAuth token")
 
-    def test(self):
-        print(self._session.get("https://api.platfr.io/api/hype/v1/user/card-info").text)
-        
+    def otp2fa(self, *args, **kwargs):
+        raise NotImplementedError
+
+    @loginrequired
+    def get_profile_info(self):
+        return self._api_request(method="GET", url=self.PROFILE_URL)["userSettings"]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from common import Banking, AuthenticationError
+from banking import Banking
 from uuid import uuid4
 import json
 import requests
@@ -10,6 +10,7 @@ import requests
 class Hype(Banking):
 
     ENROLL_URL = "https://api.hype.it/v2/auth/hypeconnector.aspx"
+    PROFILE_URL = "https://api.hype.it/v1/rest/u/profile"
     APP_VERSION = "5.1.6"
     DEVICE_ID = str(uuid4()).replace("-", "") + "hype"
     DEVICE_INFO = json.dumps({
@@ -38,11 +39,11 @@ class Hype(Banking):
         )
         try:
             if enroll1.json()["Check"] != "OK":
-                raise AuthenticationError("Login failed")
+                raise self.AuthenticationError("Login failed")
         except json.decoder.JSONDecodeError:
-            raise AuthenticationError("Failed to parse response for login request")
+            raise self.AuthenticationError("Failed to parse response for login request")
         except KeyError:
-            raise AuthenticationError("Missing data in response for login request")
+            raise self.AuthenticationError("Login failed")
         enroll2 = self._session.post(
             self.ENROLL_URL,
             data={
@@ -55,11 +56,11 @@ class Hype(Banking):
         )
         try:
             if enroll2.json()["ErrorMessage"] != "":
-                raise AuthenticationError("Server returned error: " + enroll2.json()["ErrorMessage"])
+                raise self.AuthenticationError("Server returned error: " + enroll2.json()["ErrorMessage"])
         except json.decoder.JSONDecodeError:
-            raise AuthenticationError("Failed to parse response for bioToken request")
+            raise self.RequestException("Failed to parse response for bioToken request")
         except KeyError:
-            raise AuthenticationError("Missing data in response for bioToken request")
+            raise self.AuthenticationError("Missing data in response for bioToken request")
         self._username = username
 
     def otp2fa(self, code):
@@ -79,7 +80,7 @@ class Hype(Banking):
         )
         try:
             if otp.json()["Check"] != "OK":
-                raise AuthenticationError("OTP verification failed")
+                raise self.AuthenticationError("OTP verification failed. Please login() again")
             self.token = self._session.cookies.get_dict()["token"]
             self.newids = self._session.cookies.get_dict()["newids"]
             self._session = requests.Session()
@@ -89,9 +90,6 @@ class Hype(Banking):
                 "App-Version": self.APP_VERSION
             })
         except json.decoder.JSONDecodeError:
-            raise AuthenticationError("Failed to parse response for OTP verification request")
+            raise self.RequestException("Failed to parse response for OTP verification request")
         except KeyError:
-            raise AuthenticationError("Missing data in response for OTP verification request")
-
-    def test(self):
-        print(self._session.get("https://api.hype.it/v1/rest/u/profile").text)
+            raise self.AuthenticationError("OTP verification failed. Please login() again")
