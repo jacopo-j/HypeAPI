@@ -8,6 +8,7 @@ import json
 
 
 class Banking(ABC):
+    # TODO: gestire rinnovo token
     class AuthenticationError(Exception):
         """
         Raised when an error occurs during authentication.
@@ -40,6 +41,18 @@ class Banking(ABC):
     def PROFILE_URL(cls):
         return NotImplementedError
 
+    @property
+    @classmethod
+    @abstractmethod
+    def BALANCE_URL(cls):
+        return NotImplementedError
+
+    @property
+    @classmethod
+    @abstractmethod
+    def CARD_URL(cls):
+        return NotImplementedError
+
     def __init__(self):
         self.token = None
         self._session = requests.Session()
@@ -54,11 +67,11 @@ class Banking(ABC):
         try:
             data = r.json()
         except json.decoder.JSONDecodeError:
-            raise self.RequestException("Failed to parse response")
+            raise self.RequestException("Failed to parse response: " + r.text)
         if data["responseCode"] in ("401", "007"):
             raise self.AuthenticationFailure
         elif data["responseCode"] != "200":
-            raise self.RequestException("Server returned response code " + data["responseCode"])
+            raise self.RequestException("Server returned response {responseCode}: {responseDescr}".format(**data))
         return data["data"]
 
     @abstractmethod
@@ -75,3 +88,11 @@ class Banking(ABC):
     @loginrequired
     def get_profile_info(self):
         return self._api_request(method="GET", url=self.PROFILE_URL)
+
+    @loginrequired
+    def get_balance(self):
+        return self._api_request(method="GET", url=self.BALANCE_URL)
+
+    @loginrequired
+    def get_card_info(self):
+        return self._api_request(method="GET", url=self.CARD_URL)

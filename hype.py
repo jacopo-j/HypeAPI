@@ -11,6 +11,8 @@ class Hype(Banking):
 
     ENROLL_URL = "https://api.hype.it/v2/auth/hypeconnector.aspx"
     PROFILE_URL = "https://api.hype.it/v1/rest/u/profile"
+    BALANCE_URL = "https://api.hype.it/v1/rest/u/balance"
+    CARD_URL = "https://api.hype.it/v1/rest/your/card"
     APP_VERSION = "5.1.6"
     DEVICE_ID = str(uuid4()).replace("-", "") + "hype"
     DEVICE_INFO = json.dumps({

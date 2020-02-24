@@ -12,6 +12,8 @@ class TimPay(Banking):
 
     ENROLL_URL = "https://www.hype.it/api/rest/FREE/timenrollment"
     PROFILE_URL = "https://api.platfr.io/api/hype/v1/user/financial-situation"
+    BALANCE_URL = "https://api.platfr.io/api/hype/v1/user/financial-situation"
+    CARD_URL = "https://api.platfr.io/api/hype/v1/user/card-info"
 
     def login(self, misdn, username, password):
         enroll = self._session.get(
@@ -52,8 +54,17 @@ class TimPay(Banking):
             raise self.AuthenticationError("Failed to retrieve OAuth token")
 
     def otp2fa(self, *args, **kwargs):
+        """
+        Two-factor authentication not required for TIM Pay.
+        """
         raise NotImplementedError
 
     @loginrequired
     def get_profile_info(self):
         return self._api_request(method="GET", url=self.PROFILE_URL)["userSettings"]
+
+    @loginrequired
+    def get_balance(self):
+        b = self._api_request(method="GET", url=self.BALANCE_URL)
+        del b["userSettings"]
+        return b

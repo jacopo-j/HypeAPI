@@ -23,6 +23,6 @@ def loginrequired(func):
     """
     def wrapper(self, *args, **kwargs):
         if self.token is None:
-            raise Exception("Login required")
+            raise Exception("Login required but not yet performed")
         return func(self, *args, **kwargs)
     return wrapper
