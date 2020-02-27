@@ -5,6 +5,7 @@ from banking import Banking
 from uuid import uuid4
 import json
 import requests
+from utils import loginrequired
 
 
 class Hype(Banking):
@@ -13,6 +14,7 @@ class Hype(Banking):
     PROFILE_URL = "https://api.hype.it/v1/rest/u/profile"
     BALANCE_URL = "https://api.hype.it/v1/rest/u/balance"
     CARD_URL = "https://api.hype.it/v1/rest/your/card"
+    MOVEMENTS_URL = "https://api.hype.it/v1/rest/m/last/{}"
     APP_VERSION = "5.1.6"
     DEVICE_ID = str(uuid4()).replace("-", "") + "hype"
     DEVICE_INFO = json.dumps({
@@ -95,3 +97,7 @@ class Hype(Banking):
             raise self.RequestException("Failed to parse response for OTP verification request")
         except KeyError:
             raise self.AuthenticationError("OTP verification failed. Please login() again")
+
+    @loginrequired
+    def get_movements(self, limit=5):
+        return self._api_request(method="GET", url=self.MOVEMENTS_URL.format(limit))

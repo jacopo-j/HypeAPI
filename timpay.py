@@ -4,8 +4,7 @@
 import json
 import requests
 from banking import Banking
-from utils import parse_form
-from utils import loginrequired
+from utils import parse_form, loginrequired
 
 
 class TimPay(Banking):
@@ -14,6 +13,7 @@ class TimPay(Banking):
     PROFILE_URL = "https://api.platfr.io/api/hype/v1/user/financial-situation"
     BALANCE_URL = "https://api.platfr.io/api/hype/v1/user/financial-situation"
     CARD_URL = "https://api.platfr.io/api/hype/v1/user/card-info"
+    MOVEMENTS_URL = "https://api.platfr.io/api/hype/v1/movements/{}/{}"
 
     def login(self, misdn, username, password):
         enroll = self._session.get(
@@ -68,3 +68,7 @@ class TimPay(Banking):
         b = self._api_request(method="GET", url=self.BALANCE_URL)
         del b["userSettings"]
         return b
+
+    @loginrequired
+    def get_movements(self, limit=10, offset=0):
+        return self._api_request(method="GET", url=self.MOVEMENTS_URL.format(offset, limit))

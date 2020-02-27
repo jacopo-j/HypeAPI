@@ -53,6 +53,12 @@ class Banking(ABC):
     def CARD_URL(cls):
         return NotImplementedError
 
+    @property
+    @classmethod
+    @abstractmethod
+    def MOVEMENTS_URL(cls):
+        return NotImplementedError
+
     def __init__(self):
         self.token = None
         self._session = requests.Session()
@@ -96,3 +102,7 @@ class Banking(ABC):
     @loginrequired
     def get_card_info(self):
         return self._api_request(method="GET", url=self.CARD_URL)
+
+    @abstractmethod
+    def get_movements(self, *args, **kwargs):
+        pass
