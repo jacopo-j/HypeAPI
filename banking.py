@@ -8,7 +8,7 @@ import json
 
 
 class Banking(ABC):
-    # TODO: gestire rinnovo token
+
     class AuthenticationError(Exception):
         """
         Raised when an error occurs during authentication.

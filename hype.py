@@ -155,9 +155,11 @@ class Hype(Banking):
             raise self.AuthenticationError("Missing data in response for bioToken request")
         self.token = self._session.cookies.get_dict()["token"]
         self.newids = self._session.cookies.get_dict()["newids"]
+        self._session = requests.Session()
         self._session.headers.update({
             "hype_token": self.token,
-            "newids": self.newids
+            "newids": self.newids,
+            "App-Version": self.APP_VERSION
         })
         self.bin = reenroll.json()["Bin"]
 
