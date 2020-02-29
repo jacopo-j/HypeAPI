@@ -59,6 +59,12 @@ class TimPay(Banking):
         """
         raise NotImplementedError
 
+    def renew(self, *args, **kwargs):
+        """
+        Token renewal not available for TIM Pay.
+        """
+        raise NotImplementedError
+
     @loginrequired
     def get_profile_info(self):
         return self._api_request(method="GET", url=self.PROFILE_URL)["userSettings"]

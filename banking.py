@@ -91,6 +91,10 @@ class Banking(ABC):
         """
         pass
 
+    @abstractmethod
+    def renew(self, *args, **kwargs):
+        pass
+
     @loginrequired
     def get_profile_info(self):
         return self._api_request(method="GET", url=self.PROFILE_URL)
