@@ -51,7 +51,7 @@ class Hype(Banking):
                 "pin": password,
                 "platform": "IPHONE"
             },
-            timeout=5
+            timeout=10
         )
         try:
             if enroll1.json()["Check"] != "OK":
@@ -68,7 +68,7 @@ class Hype(Banking):
                 "function": "INFO/ENROLLBIO.SPR",
                 "platform": "IPHONE"
             },
-            timeout=5
+            timeout=10
         )
         try:
             if enroll2.json()["ErrorMessage"] != "":
@@ -93,7 +93,7 @@ class Hype(Banking):
                 "pwd": str(code),
                 "platform": "IPHONE"
             },
-            timeout=5
+            timeout=10
         )
         try:
             if otp.json()["Check"] != "OK":
@@ -127,7 +127,7 @@ class Hype(Banking):
                 "function": "FREE/LOGINFIRSTSTEPFA.SPR",
                 "platform": "IPHONE"
             },
-            timeout=5
+            timeout=10
         )
         try:
             if renewal.json()["Check"] != "OK":
@@ -144,7 +144,7 @@ class Hype(Banking):
                 "function": "INFO/ENROLLBIO.SPR",
                 "platform": "IPHONE"
             },
-            timeout=5
+            timeout=10
         )
         try:
             if reenroll.json()["ErrorMessage"] != "":

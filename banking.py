@@ -74,6 +74,8 @@ class Banking(ABC):
             data = r.json()
         except json.decoder.JSONDecodeError:
             raise self.RequestException("Failed to parse response: " + r.text)
+        if "responseCode" not in data:
+            raise self.RequestException("Missing response code from response: " + r.text)
         if data["responseCode"] in ("401", "007"):
             raise self.AuthenticationFailure
         elif data["responseCode"] != "200":

@@ -19,7 +19,7 @@ class TimPay(Banking):
         enroll = self._session.get(
             self.ENROLL_URL,
             params={"misdn": str(misdn), "status": "REGISTERED"},
-            timeout=5
+            timeout=10
         )
         login_form = parse_form(
             enroll.text,
@@ -30,7 +30,7 @@ class TimPay(Banking):
         auth = self._session.post(
             login_form["url"],
             data=login_form["post_data"],
-            timeout=5
+            timeout=10
         )
         try:
             auth_form = parse_form(auth.text)
@@ -39,7 +39,7 @@ class TimPay(Banking):
         res = self._session.post(
             auth_form["url"],
             data=auth_form["post_data"],
-            timeout=5
+            timeout=10
         )
         try:
             self.token = res.json()["data"]["c_oauth_token"]
